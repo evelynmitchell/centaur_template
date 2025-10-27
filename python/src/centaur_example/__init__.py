@@ -10,6 +10,7 @@ __version__ = "0.1.0"
 from centaur_example.calculator import add, divide, multiply, subtract
 from centaur_example.text_utils import count_words, reverse_string, to_title_case
 
+
 __all__ = [
     "add",
     "subtract",

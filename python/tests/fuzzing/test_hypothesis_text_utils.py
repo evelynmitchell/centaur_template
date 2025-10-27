@@ -2,7 +2,8 @@
 Property-based tests using Hypothesis for text_utils module.
 """
 
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from centaur_example.text_utils import count_words, reverse_string, to_title_case
 
