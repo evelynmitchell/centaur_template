@@ -412,6 +412,8 @@ cargo fuzz init
 
 **Deployment**: Docs auto-deploy to GitHub Pages on push to main
 
+**Strict Mode**: Template builds docs without `--strict` to allow example code warnings. Users should enable `--strict` after replacing example code by editing `.github/workflows/docs.yml`.
+
 ### Removing Example Code
 
 **Python**:
@@ -458,6 +460,11 @@ rm rust/tests/integration_test.rs
    - Remove workflows you do not need
    - Update `.devcontainer/setup.sh` to skip unused tools
    - Update `docs/` structure
+
+6. **Enable documentation strict mode**:
+   - After removing example code, edit `.github/workflows/docs.yml`
+   - Change `mkdocs build` to `mkdocs build --strict` (2 places)
+   - This ensures documentation quality by failing on warnings
 
 ### Working with the Template
 

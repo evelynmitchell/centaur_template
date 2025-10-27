@@ -153,8 +153,13 @@ mkdocs serve
 # Build docs
 mkdocs build
 
+# Build with strict mode (recommended for production)
+mkdocs build --strict
+
 # Docs are auto-deployed to GitHub Pages on push to main
 ```
+
+**Note**: The template builds without `--strict` mode to allow example code with documentation warnings. Once you've replaced the example code with your own, enable strict mode in `.github/workflows/docs.yml` for better documentation quality checks.
 
 ## Customizing for Your Project
 
@@ -199,7 +204,23 @@ authors = ["Your Name <your.email@example.com>"]
 - Update `docs/index.md` with your project overview
 - Modify API documentation paths in `docs/api/`
 
-### 4. Configure Repository Settings
+### 4. Enable Strict Mode for Documentation
+
+Once you've replaced the example code, enable strict mode for better documentation quality:
+
+In `.github/workflows/docs.yml`, change:
+```yaml
+run: mkdocs build
+```
+
+To:
+```yaml
+run: mkdocs build --strict
+```
+
+This will fail the build on documentation warnings, ensuring high-quality docs.
+
+### 5. Configure Repository Settings
 
 1. **Enable GitHub Pages**:
    - Settings → Pages → Source: GitHub Actions
