@@ -8,9 +8,7 @@ This module demonstrates:
 - Edge case management
 """
 
-from typing import Union
-
-Number = Union[int, float]
+Number = int | float
 
 
 def add(a: Number, b: Number) -> Number:
