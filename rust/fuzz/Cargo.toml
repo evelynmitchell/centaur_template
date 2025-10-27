@@ -1,0 +1,30 @@
+[package]
+name = "centaur-example-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.centaur-example]
+path = ".."
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_calculator"
+path = "fuzz_targets/fuzz_calculator.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_text_utils"
+path = "fuzz_targets/fuzz_text_utils.rs"
+test = false
+doc = false

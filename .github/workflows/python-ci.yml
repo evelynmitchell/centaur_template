@@ -1,0 +1,153 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'python/**'
+      - '.github/workflows/python-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'python/**'
+      - '.github/workflows/python-ci.yml'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  # Basic: Linting and formatting checks
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./python
+        run: uv sync --all-extras
+
+      - name: Run ruff (linting)
+        working-directory: ./python
+        run: uv run ruff check src tests
+
+      - name: Run black (formatting check)
+        working-directory: ./python
+        run: uv run black --check src tests
+
+      - name: Run mypy (type checking)
+        working-directory: ./python
+        run: uv run mypy src
+
+  # Intermediate: Testing with coverage
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            python/.venv
+          key: ${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('python/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        working-directory: ./python
+        run: uv sync --all-extras
+
+      - name: Run unit tests
+        working-directory: ./python
+        run: uv run pytest tests/unit/ -v --cov --cov-report=xml --cov-report=term
+
+      - name: Run integration tests
+        working-directory: ./python
+        run: uv run pytest tests/integration/ -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./python/coverage.xml
+          flags: python-${{ matrix.python-version }}
+          name: python-${{ matrix.python-version }}
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # Advanced: Fuzzing tests (scheduled)
+  fuzz:
+    name: Fuzzing Tests
+    runs-on: ubuntu-latest
+    # Only run on schedule or manual trigger
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./python
+        run: uv sync --all-extras
+
+      - name: Run Hypothesis tests
+        working-directory: ./python
+        run: uv run pytest tests/fuzzing/test_hypothesis_*.py -v --hypothesis-profile=ci
+
+      - name: Run atheris fuzzing (limited time)
+        working-directory: ./python
+        run: |
+          # Run each fuzzer for 60 seconds
+          timeout 60 uv run python tests/fuzzing/fuzz_atheris_calculator.py || true
+        continue-on-error: true
+
+  # Advanced: Build and artifact creation
+  build:
+    name: Build Distribution
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Build package
+        working-directory: ./python
+        run: uv build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: python/dist/
+          retention-days: 7

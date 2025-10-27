@@ -1,0 +1,92 @@
+site_name: Centaur Template Documentation
+site_description: Multi-language development template with CI/CD and testing
+site_author: Your Name
+repo_url: https://github.com/yourusername/centaur_template
+repo_name: centaur_template
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [python/src]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            docstring_style: google
+            merge_init_into_class: true
+            show_signature_annotations: true
+            separate_signature: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Development:
+      - Getting Started: development/getting-started.md
+      - Python Setup: development/python-setup.md
+      - Rust Setup: development/rust-setup.md
+      - Testing Strategy: development/testing.md
+  - API Reference:
+      - Python API: api/python.md
+      - Rust API: api/rust.md
+  - Testing:
+      - Unit Tests: testing/unit-tests.md
+      - Integration Tests: testing/integration-tests.md
+      - Fuzzing: testing/fuzzing.md
+  - CI/CD:
+      - GitHub Actions: cicd/github-actions.md
+      - Pre-commit Hooks: cicd/pre-commit.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/yourusername

@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+python/.venv/
+python/dist/
+python/build/
+python/*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Rust
+rust/target/
+rust/Cargo.lock
+rust/pkg/
+rust/fuzz/target/
+rust/fuzz/corpus/
+rust/fuzz/artifacts/
+rust/hfuzz_target/
+rust/hfuzz_workspace/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Documentation
+site/
+.mkdocs_cache/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Dependencies
+node_modules/

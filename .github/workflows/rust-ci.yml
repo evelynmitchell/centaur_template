@@ -1,0 +1,206 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-ci.yml'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Basic: Linting and formatting
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('rust/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('rust/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: rust/target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('rust/Cargo.lock') }}
+
+      - name: Check formatting
+        working-directory: ./rust
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        working-directory: ./rust
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  # Intermediate: Testing with coverage
+  test:
+    name: Test (Rust ${{ matrix.rust }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        rust: [stable, beta]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust/target
+          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ matrix.rust }}-
+
+      - name: Build
+        working-directory: ./rust
+        run: cargo build --verbose
+
+      - name: Run unit tests
+        working-directory: ./rust
+        run: cargo test --lib --verbose
+
+      - name: Run integration tests
+        working-directory: ./rust
+        run: cargo test --test '*' --verbose
+
+      - name: Install cargo-tarpaulin
+        if: matrix.rust == 'stable'
+        run: cargo install cargo-tarpaulin
+
+      - name: Generate coverage
+        if: matrix.rust == 'stable'
+        working-directory: ./rust
+        run: cargo tarpaulin --out xml --output-dir ../
+
+      - name: Upload coverage to Codecov
+        if: matrix.rust == 'stable'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./cobertura.xml
+          flags: rust
+          name: rust-${{ matrix.rust }}
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # Advanced: Fuzzing (scheduled or manual)
+  fuzz:
+    name: Fuzzing Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz
+
+      - name: Initialize fuzz targets (if needed)
+        working-directory: ./rust
+        run: |
+          if [ ! -d "fuzz" ]; then
+            cargo fuzz init
+          fi
+
+      - name: List fuzz targets
+        working-directory: ./rust
+        run: cargo fuzz list
+
+      - name: Run fuzz tests (limited time)
+        working-directory: ./rust
+        run: |
+          # Run each fuzz target for 60 seconds
+          for target in $(cargo fuzz list); do
+            echo "Fuzzing $target..."
+            timeout 60 cargo fuzz run $target || true
+          done
+        continue-on-error: true
+
+  # Advanced: WASM build
+  wasm:
+    name: WebAssembly Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM
+        working-directory: ./rust
+        run: wasm-pack build --target web
+
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-pkg
+          path: rust/pkg/
+          retention-days: 7
+
+  # Advanced: Build release artifacts
+  build:
+    name: Build Release
+    runs-on: ${{ matrix.os }}
+    needs: [lint, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        working-directory: ./rust
+        run: cargo build --release --verbose
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-release-${{ matrix.os }}
+          path: |
+            rust/target/release/centaur-example*
+            !rust/target/release/*.d
+          retention-days: 7

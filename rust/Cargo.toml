@@ -1,0 +1,35 @@
+[package]
+name = "centaur-example"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+description = "Example project for Centaur template"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Add your dependencies here
+
+[dev-dependencies]
+# Testing dependencies
+criterion = "0.5"
+proptest = "1.4"
+quickcheck = "1.0"
+
+# Fuzzing is configured separately via cargo-fuzz
+# See fuzz/ directory for fuzzing targets
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.bench]
+opt-level = 3
+
+# For WASM builds
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
