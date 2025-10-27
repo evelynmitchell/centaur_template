@@ -2,6 +2,8 @@
 
 A comprehensive multi-language development template for GitHub Codespaces featuring Python, Rust, comprehensive testing strategies, CI/CD workflows, and auto-generated documentation.
 
+**📚 [Live Documentation](https://evelynmitchell.github.io/centaur_template/)** | [View Example](https://github.com/EvelynM/centaur_template)
+
 ## Features
 
 ### Multi-Language Support
@@ -26,7 +28,7 @@ A comprehensive multi-language development template for GitHub Codespaces featur
 - **Auto-generated API docs**:
   - Python: mkdocstrings
   - Rust: cargo doc integration
-- **GitHub Pages** deployment
+- **GitHub Pages** deployment: [evelynmitchell.github.io/centaur_template](https://evelynmitchell.github.io/centaur_template/)
 
 ### Code Quality
 - Pre-commit hooks for automatic formatting
@@ -295,7 +297,7 @@ Hooks run automatically. If they modify files:
 
 ## Documentation
 
-Full documentation is available at: `https://yourusername.github.io/centaur_template/`
+Full documentation is available at: **[evelynmitchell.github.io/centaur_template](https://evelynmitchell.github.io/centaur_template/)**
 
 Or run locally:
 ```bash
