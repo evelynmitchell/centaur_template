@@ -4,8 +4,8 @@ Property-based tests using Hypothesis for calculator module.
 Hypothesis generates test cases automatically to find edge cases.
 """
 
-import pytest
 from hypothesis import given, strategies as st
+import pytest
 
 from centaur_example.calculator import add, divide, multiply, subtract
 
