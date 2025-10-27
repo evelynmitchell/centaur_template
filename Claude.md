@@ -16,7 +16,7 @@ This is a **multi-language project template** for GitHub Codespaces with compreh
 
 **Languages**: Python (3.12+) and Rust (edition 2024), independent but coexisting
 
-**Testing**: Unit tests, integration tests, and fuzzing (Hypothesis/atheris for Python, cargo-fuzz/honggfuzz for Rust)
+**Testing**: Unit tests, integration tests, and fuzzing (Hypothesis for Python, cargo-fuzz/honggfuzz for Rust)
 
 **CI/CD**: GitHub Actions with three levels (basic linting → intermediate testing+coverage → advanced fuzzing+artifacts)
 
@@ -142,7 +142,6 @@ uv run python
 - `ruff>=0.1.0` - Fast Python linter
 - `mypy>=1.8.0` - Type checker
 - `hypothesis>=6.92.0` - Property-based testing
-- `atheris>=2.3.0` - Coverage-guided fuzzing
 
 Add your project dependencies to `pyproject.toml` under `[project.dependencies]`.
 
@@ -288,7 +287,7 @@ This repository uses GitHub Actions with **three levels of CI/CD**:
 - Matrix testing across Python 3.12/3.13 and Rust stable/beta
 
 **Level 3 - Advanced** (runs on schedule or manual trigger):
-- Fuzzing tests (Hypothesis, atheris, cargo-fuzz)
+- Fuzzing tests (Hypothesis, cargo-fuzz)
 - Build artifacts (Python wheels, Rust binaries, WASM)
 - Multi-platform builds (Linux, macOS, Windows for Rust)
 - Documentation deployment to GitHub Pages
@@ -387,8 +386,7 @@ tests/
 
 **Python Fuzzing**:
 - Hypothesis: Write property-based tests in `tests/fuzzing/test_hypothesis_*.py`
-- atheris: Create fuzz scripts in `tests/fuzzing/fuzz_atheris_*.py`
-- Run with pytest or standalone
+- Run with pytest: `uv run pytest tests/fuzzing/ -v`
 
 **Rust Fuzzing**:
 ```bash
@@ -421,7 +419,7 @@ cargo fuzz init
 rm -rf python/src/centaur_example
 rm python/tests/unit/test_*.py
 rm python/tests/integration/test_*.py
-rm python/tests/fuzzing/*.py
+rm python/tests/fuzzing/test_hypothesis_*.py
 ```
 
 **Rust**:

@@ -119,13 +119,6 @@ jobs:
         working-directory: ./python
         run: uv run pytest tests/fuzzing/test_hypothesis_*.py -v --hypothesis-profile=ci
 
-      - name: Run atheris fuzzing (limited time)
-        working-directory: ./python
-        run: |
-          # Run each fuzzer for 60 seconds
-          timeout 60 uv run python tests/fuzzing/fuzz_atheris_calculator.py || true
-        continue-on-error: true
-
   # Advanced: Build and artifact creation
   build:
     name: Build Distribution

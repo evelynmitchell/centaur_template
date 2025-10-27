@@ -16,7 +16,7 @@ Fuzzing helps find:
 
 ### Hypothesis (Property-Based Testing)
 
-Hypothesis generates test inputs automatically to verify properties of your code.
+Hypothesis generates test inputs automatically to verify properties of your code. This template uses Hypothesis as the primary fuzzing tool for Python.
 
 #### Setup
 
@@ -82,53 +82,6 @@ In `pyproject.toml`:
 addopts = [
     "--hypothesis-show-statistics",
 ]
-```
-
-### atheris (Coverage-Guided Fuzzing)
-
-atheris provides coverage-guided fuzzing similar to libFuzzer.
-
-#### Setup
-
-```bash
-uv add --dev atheris
-```
-
-#### Writing Fuzz Targets
-
-```python
-import sys
-import atheris
-from centaur_example.calculator import add, divide
-
-def fuzz_calculator(data: bytes) -> None:
-    fdp = atheris.FuzzedDataProvider(data)
-
-    # Generate random inputs
-    a = fdp.ConsumeFloat()
-    b = fdp.ConsumeFloat()
-
-    # Test operations
-    try:
-        _ = add(a, b)
-        if b != 0:
-            _ = divide(a, b)
-    except (OverflowError, ValueError):
-        pass  # Expected for some inputs
-
-if __name__ == "__main__":
-    atheris.Setup(sys.argv, fuzz_calculator)
-    atheris.Fuzz()
-```
-
-#### Running
-
-```bash
-# Run for 60 seconds
-timeout 60 uv run python tests/fuzzing/fuzz_atheris_calculator.py
-
-# With specific corpus
-uv run python tests/fuzzing/fuzz_atheris_calculator.py corpus/
 ```
 
 ## Rust Fuzzing

@@ -13,7 +13,7 @@ A comprehensive multi-language development template for GitHub Codespaces featur
 - **Unit Tests**: Fast, isolated tests for individual functions
 - **Integration Tests**: Cross-component testing
 - **Fuzzing**:
-  - Python: Hypothesis (property-based) + atheris (coverage-guided)
+  - Python: Hypothesis (property-based testing)
   - Rust: cargo-fuzz (libFuzzer) + honggfuzz
 
 ### CI/CD Pipeline (3 Levels)
@@ -165,7 +165,7 @@ mkdocs build
 rm -rf python/src/centaur_example
 rm -rf python/tests/unit/test_*.py
 rm -rf python/tests/integration/test_*.py
-rm -rf python/tests/fuzzing/test_*.py
+rm -rf python/tests/fuzzing/test_hypothesis_*.py
 ```
 
 **Rust:**
@@ -264,7 +264,6 @@ Hooks run automatically. If they modify files:
 - **Unit Tests**: Test individual functions with edge cases
 - **Integration Tests**: Test components working together
 - **Property-Based (Hypothesis)**: Automatically generate test cases
-- **Fuzzing (atheris)**: Coverage-guided security testing
 
 ### Rust
 

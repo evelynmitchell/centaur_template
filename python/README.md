@@ -55,13 +55,12 @@ Tests that verify components work together correctly.
 
 ### Fuzzing Tests
 - **Hypothesis**: Property-based testing for logic validation
-- **Atheris**: Coverage-guided fuzzing for security testing
 
 ## Removing Example Code
 
 To use this template for your own project:
 
 1. Delete example modules: `src/centaur_example/{calculator,text_utils}.py`
-2. Delete example tests: `tests/**/{test_calculator,test_text_utils,test_fuzz_*}.py`
+2. Delete example tests: `tests/**/{test_calculator,test_text_utils,test_hypothesis_*}.py`
 3. Update `pyproject.toml` with your project name and dependencies
 4. Keep the directory structure and configuration

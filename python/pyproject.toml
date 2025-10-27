@@ -19,7 +19,6 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
     "hypothesis>=6.92.0",
-    "atheris>=2.3.0",
 ]
 
 [build-system]

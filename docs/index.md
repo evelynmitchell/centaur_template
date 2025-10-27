@@ -53,7 +53,6 @@ Then open http://localhost:8000
 === "Python"
     - Unit tests with pytest
     - Property-based testing with Hypothesis
-    - Coverage-guided fuzzing with atheris
 
 === "Rust"
     - Unit and integration tests
