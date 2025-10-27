@@ -272,6 +272,24 @@ Common errors to avoid:
 - Watch for edge case "thinkos" - assumptions about cases that aren't needed
 - Always use version control with meaningful commits
 
+**Python Import Ordering** (critical for ruff/isort):
+- Imports are sorted **alphabetically by module name** within each group
+- Groups: (1) standard library, (2) third-party, (3) local imports
+- Blank line separates each group
+- **The syntax (`import` vs `from`) doesn't matter** - only the module name matters
+- Example:
+  ```python
+  # Correct (alphabetical by module name)
+  from hypothesis import given, strategies as st
+  import pytest
+
+  from centaur_example.calculator import add
+
+  # Wrong (not alphabetical)
+  import pytest
+  from hypothesis import given, strategies as st
+  ```
+
 ### CI/CD with GitHub Actions
 
 This repository uses GitHub Actions with **three levels of CI/CD**:
