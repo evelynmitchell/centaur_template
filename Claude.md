@@ -277,10 +277,12 @@ Common errors to avoid:
 - Groups: (1) standard library, (2) third-party, (3) local imports
 - Blank line separates each group
 - **The syntax (`import` vs `from`) doesn't matter** - only the module name matters
+- **Use `ruff check --fix` to auto-format** - don't manually fix imports!
 - Example:
   ```python
   # Correct (alphabetical by module name)
-  from hypothesis import given, strategies as st
+  from hypothesis import given
+  from hypothesis import strategies as st
   import pytest
 
   from centaur_example.calculator import add
@@ -289,6 +291,8 @@ Common errors to avoid:
   import pytest
   from hypothesis import given, strategies as st
   ```
+- **Best practice**: Run `uv run ruff check src tests --fix` before committing
+- ruff's auto-fix will split multi-imports into separate lines and sort correctly
 
 ### CI/CD with GitHub Actions
 
